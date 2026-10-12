@@ -1,0 +1,5 @@
+<?php require 'includes/header.php';
+if($_SERVER['REQUEST_METHOD']==='POST'){$s=$pdo->prepare("INSERT INTO customers(name,phone,email,address) VALUES(?,?,?,?)");$s->execute([$_POST['name'],$_POST['phone'],$_POST['email'],$_POST['address']]);header('Location: customers.php');exit;}
+$rows=$pdo->query("SELECT c.*,COALESCE(SUM(s.balance),0) balance FROM customers c LEFT JOIN sales s ON s.customer_id=c.id GROUP BY c.id ORDER BY c.name")->fetchAll();
+?><h1>Customers</h1><div class="panel"><form method="post"><div class="row"><input name="name" placeholder="Customer name" required><input name="phone" placeholder="Phone"></div><div class="row"><input name="email" placeholder="Email"><input name="address" placeholder="Address"></div><button>Add Customer</button></form></div>
+<div class="panel"><table><tr><th>Name</th><th>Phone</th><th>Email</th><th>Balance</th></tr><?php foreach($rows as $r):?><tr><td><?=e($r['name'])?></td><td><?=e($r['phone'])?></td><td><?=e($r['email'])?></td><td class="low">KSh <?=money($r['balance'])?></td></tr><?php endforeach;?></table></div><?php require 'includes/footer.php';?>
